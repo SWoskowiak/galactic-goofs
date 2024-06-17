@@ -16,6 +16,7 @@ RUN apt-get update \
     postgresql-client \
     curl \
     netcat-openbsd \
+    dos2unix \
     && curl -sSL https://install.python-poetry.org | python - \
     && apt-get remove -y curl \
     && apt-get -y autoremove \
@@ -34,8 +35,8 @@ COPY ./alembic /galactic-goofs-webserver/alembic/
 COPY ./alembic.ini /galactic-goofs-webserver/alembic.ini
 COPY ./run.sh /galactic-goofs-webserver/run.sh
 
-# Make the entrypoint script executable
-RUN chmod +x /galactic-goofs-webserver/run.sh
+# Make the entrypoint script executable and enfore line ending compatibility
+RUN dos2unix /galactic-goofs-webserver/run.sh && chmod +x /galactic-goofs-webserver/run.sh
 
 # Set the entrypoint
 ENTRYPOINT ["/galactic-goofs-webserver/run.sh"]
