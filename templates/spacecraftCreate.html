@@ -1,0 +1,12 @@
+<form hx-encoding='multipart/form-data' hx-post='/spacecraft/' hx-swap="none">
+    <input type="text" name="name" placeholder="name" aria-label="Space Craft Name Entry" required minlength="1" />
+    <input type="text" name="cosparID" placeholder="cospar ID" aria-label="Cospar ID Entry" required minlength="1" />
+    <select name="status" aria-label="Select Spacecraft Status" required>
+        <option selected disabled value="">
+            Select Spacecraft's Status...
+        </option>
+        <option value="NOMINAL">Nominal</option>
+        <option value="MALFUNCTIONING">Malfunctioning</option>
+    </select>
+    <input type="submit" value="Create Spacecraft" />
+</form>

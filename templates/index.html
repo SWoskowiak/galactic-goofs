@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Galactic Goofs</title>
+    <meta name="description"
+        content="An extremely accurate simulation of of how to fix satellites down to every last technical detail">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.12"
+        integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"
+        crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const eventSource = new EventSource("/spacecraft/stream");
+            const eventsLog = document.getElementById('event_log');
+
+            function logEvent(message) {
+                // Get the current date and time
+                const now = new Date();
+                const dateTime = now.toLocaleString();  // Convert to a string in the local time zone
+
+                // Create a new element
+                const newMessage = document.createElement('p');
+                newMessage.textContent = `${dateTime}: ${message}`;
+                eventsLog.insertBefore(newMessage, eventsLog.firstChild);
+            }
+            eventSource.addEventListener('create_spacecraft', function (e) {
+                console.log('Create Spacecraft')
+                htmx.trigger('#spacecraft_list', 'new-spacecraft') // Refetch spacecraft list when we get a new one
+                logEvent('New Spacecraft Created!')
+            });
+
+            // NOTE: This is a bit inefficient, with more time I would implement more detail into replacing discrete elements but refetching the whole list works just fine for now
+            eventSource.addEventListener('repair_spacecraft', function (e) {
+                console.log('Repair Spacecraft')
+                htmx.trigger('#spacecraft_list', 'repair-spacecraft') // Refetch spacecraft list when we repair one
+                logEvent('Spacecraft Repaired!')
+            });
+            eventSource.addEventListener('delete_spacecraft', function (e) {
+                console.log('Delete Spacecraft')
+                htmx.trigger('#spacecraft_list', 'delete-spacecraft') // Refetch spacecraft list when we repair one
+                logEvent('Spacecraft deleted!')
+            });
+            eventSource.addEventListener('random_malfunction', function (e) {
+                console.log('Random Malfunction')
+                htmx.trigger('#spacecraft_list', 'random-malfunction') // Refetch spacecraft list when we repair one
+                logEvent('Spacecraft Malfunction!')
+            });
+        });
+    </script>
+    <style>
+        .spacecraftList li {
+            list-style: none;
+            border-bottom: 2px dotted whitesmoke;
+        }
+
+        .spacecraftList li.malfunctioning {
+            background-color: #28191f;
+        }
+
+        .spacecraftList button.fix {
+            width: 30%
+        }
+
+        .spacecraftList button.delete {
+            width: 50%;
+            background-color: tomato;
+            border-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container-fluid">
+        <p>Create spacecraft using the form below.</p>
+        <p>Every 5 seconds the server will randomly pick a functioning spacecraft to malfunction</p>
+        <p>All create/fix/delete/malfunction events are syncronized to connected clients using SSE events!</p>
+        <div class="grid">
+            <div id="spacecraft_create">
+                {% include 'spacecraftCreate.html' %}
+                <div id="event_log"></div>
+            </div>
+            <div id="spacecraft_list" hx-get="/spacecraft/list/"
+                hx-trigger="load, new-spacecraft, repair-spacecraft, delete-spacecraft, random-malfunction"
+                hx-swap="innerHTML">
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

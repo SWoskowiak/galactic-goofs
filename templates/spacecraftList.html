@@ -1,0 +1,8 @@
+<!-- spacecraftList.html -->
+<ul class="spacecraftList">
+    {% for spacecraft in spacecrafts %}
+        {% with spacecraft=spacecraft %}
+           {% include "spacecraftItem.html" %}
+        {% endwith %}
+    {% endfor %}
+</ul>

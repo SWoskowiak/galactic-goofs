@@ -1,0 +1,18 @@
+<!-- spacecraftItem.html -->
+<li {%- if spacecraft.status=='MALFUNCTIONING' %} class="malfunctioning" {% endif %}>
+    <div class="grid">
+        <span>Name: {{ spacecraft.name }}</span>
+        <span>COSPAR ID: {{ spacecraft.cospar_id }}</span>
+        <span>Status: {{ spacecraft.status }}</span>
+    </div>
+    <div class="grid">
+        <button class="fix" hx-patch="/spacecraft/repair/{{ spacecraft.uuid }}/" hx-swap="none" {%- if
+            spacecraft.status=='NOMINAL' %} disabled{% endif %}>
+            Fix
+        </button>
+        <button class="delete" hx-delete="/spacecraft/{{ spacecraft.uuid }}/" hx-swap="outerHTML" hx-target="closest li"
+            hx-remove hx-confirm="Are you sure you want to delete this spacecraft">
+            Delete
+        </button>
+    </div>
+</li>
